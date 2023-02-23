@@ -1,0 +1,86 @@
+##################################################################################
+#METAPIPE SCRIPTS
+##################################################################################
+1_merge_pear.sh
+2a_preparing_tags_LCPI.pl
+2b_demulti_dual_index_ionboth.sh
+2b_demulti_dual_index_linked.sh
+3_tag_primer_clipping_clean_derep_pbs.sh
+3_tag_primer_clipping_clean_derep_slurm.sh
+4_clustering_swarm_with_chim_filter_pbs.sh
+4_clustering_swarm_with_chim_filter_slurm.sh
+5_BLAST_options.sh
+6a_build_OTU_table.sh
+6b_filter_OTU_table.sh
+DB_BOLD_download_refs.sh
+DB_BOLD_lineage_primers_cut.sh
+DB_NCBI_download_refs.sh
+DB_NCBI_lineage_pbs.sh
+DB_NCBI_lineage_slurm.sh
+DB_NCBI_primers_cut.sh
+
+##################################################################################
+#SLURM JOBS
+##################################################################################
+run_1_merge_reads_PEAR.slurm
+run_2_demultiplexing_CUTADAPT.slurm
+run_3_tag_primer_clipping_clean_derep.slurm
+run_4_Clustering_SWARM.slurm
+run_5_BLAST.slurm
+run_6_OTU_table.slurm
+run_DB_BOLD_lineage_primers_cut.slurm
+run_DB_NCBI_lineage.slurm
+run_DB_NCBI_primers_cut.slurm
+
+##################################################################################
+#PBS JOBS
+##################################################################################
+job_1_merge_reads_PEAR.pbs
+job_2_demultiplexing_CUTADAPT.pbs
+job_3_tag_primer_clipping_clean_derep.pbs
+job_4_Clustering_SWARM.pbs
+job_5_BLAST.pbs
+job_6_OTU_table.pbs
+job_DB_BOLD_download.pbs
+job_DB_BOLD_lineage_primers_cut.pbs
+job_DB_NCBI_download.pbs
+job_DB_NCBI_lineage.pbs
+job_DB_NCBI_primers_cut.pbs
+
+##################################################################################
+#INSTALL & DEPENDENCES
+6a_OTU_contingency_table.py --> 6a_build_OTU_table.sh
+5_Blast_results_format.pl --> 5_BLAST_options.sh
+5_taxa_assignment_table.pl --> 5_BLAST_options.sh
+wget https://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz --> BLAST
+tar -zxvf taxdb.tar.gz 
+NCBI_lineage_dups.pl --> DB_NCBI_lineage
+NCBI_lineage_edit.pl --> DB_NCBI_lineage
+wget https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz --> NCBI_lineage
+wget https://github.com/shenwei356/taxonkit/releases/download/v0.8.0/taxonkit_linux_amd64.tar.gz (conda install -c bioconda taxonkit) --> NCBI_lineage
+tar -zxvf taxonkit_linux_amd64.tar.gz
+wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz --> NCBI_lineage
+tar -zxvf taxdump.tar.gz
+mkdir -p $HOME/.taxonkit
+cp names.dmp nodes.dmp delnodes.dmp merged.dmp $HOME/.taxonkit
+taxonkit -h
+rm *.dmp taxdump.tar.gz readme.txt gc.prt
+
+Miniconda install: https://docs.conda.io/en/latest/miniconda.html#linux-installers
+conda update -n base conda
+conda config --add channels bioconda
+conda install -c bioconda cutadapt
+conda install -c bioconda vsearch
+conda install -c bioconda seqkit
+conda install -c bioconda seqtk
+conda install -c bioconda perl-bioperl
+conda update perl-bioperl
+conda install -c anaconda biopython
+conda install snippy==4.05
+conda install -c bioconda swarm=3.0.0=hc9558a2_0
+conda install -c bioconda pear=0.9.6=h2f06484_6
+conda install -c bioconda blast
+conda install -c bioconda entrez-direct
+conda install -y -c conda-forge mamba
+mamba create --quiet -y -n py27 python=2.7 ipykernel
+##################################################################################
