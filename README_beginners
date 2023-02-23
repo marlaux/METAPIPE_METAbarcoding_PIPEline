@@ -1,0 +1,20 @@
+JOB/QUEUE SYSTEM IN HPC ENVIRONMENT (high-performance computing environment)
+The HPC clusters are resources that are shared between many users, and to ensure fair use everyone must do their computations by submitting jobs through a queue system (batch system) that will execute the applications on the available resources. 
+
+RUNNING JOBS\RODANDO OS JOBS
+The "job", is a script to run on HPC using a "queue" system. The jobs run on the compute nodes, with the computatiohnal resources required.
+There are different queue systems, as SLURM, PBS and OpenPBS
+
+This pipeline was built/configured to run through SLURM Workload Manager, and PBS. All the the scripts run without a job, directly in the command line,
+but if you are working on a server, you must run it using the PBS or SLURM jobs.
+
+In METAPIPE, the command, or a set of different chained commands, are set up in bash scripts ".sh", from 1 to 6, indicating the execution order. Example: 
+1_merge_pear.sh <-- the script, type ./1_merge_pear.sh -h 
+run_1_merge_reads_PEAR.slurm --> SLURM system will place your script on a queue, waiting for the resources you asked and running on the compute nodes.
+job_1_merge_reads_PEAR.pbs --> PBS system will place your script on a queue, waiting for the resources you asked and running on the compute nodes.
+
+For each step, take a time to study what is been done, along with the tools and respective options. 
+Your project question may be easily answered using some script optional argument/parameter, remember that!
+
+Besides reading lots and lots of scientific papers, do not forget that Google can help you a lot!
+Pages like https://www.biostars.org/ and http://seqanswers.com/ can solve your errors and doubts most of the times.
