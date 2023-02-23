@@ -1,0 +1,166 @@
+##################################################################################
+#FORMAT REFERENCES
+##################################################################################
+#NCBI
+#DEPENDENCIES:
+nucl_gb.accession2taxid.gz
+taxonkit
+NCBI_lineage_dups.pl
+NCBI_lineage_edit.pl
+
+DOWNLOAD NCBI SEQUENCES
+>./DB_NCBI_download_refs.sh -h
+Usage: ./DB_NCBI_download_refs.sh [-n taxon name] [-t taxonid] [-m marker]
+-n     target taxon name, e.g. Arachnida
+-t     NCBI Taxonomy ID, e.g txid6854
+-m     marker, e.g. COI, ITS, ITS1, ITS2, trnL, rbcL, matK...
+-h     print this help
+Example: 
+>./DB_NCBI_download_refs.sh -n Arachnida -t txid6854 -m COI
+
+FORMAT REFERENCE SEQUENCES
+>./DB_NCBI_lineage_pbs.sh -h
+Format and include taxonomic lineage in the NCBI reference fasta.
+This script edit the headers from the reference multifasta file,
+in order to build your local database to run BLAST.
+
+Usage: ./DB_NCBI_lineage_pbs.sh [-r NCBI_references.fasta] [-p output_prefix]
+-r     references fasta file
+-p     prefix to output filenames (e.g ITS_NCBI)
+-h     Print this Help.
+Example:
+>./DB_NCBI_lineage_pbs.sh -r NCBI_references_downloaded.fasta -p prefix
+
+CUT REFERENCES ACCORDING TO PRIMERS
+>./DB_NCBI_primers_cut.sh -h
+Usage: ./DB_NCBI_primers_cut.sh [-r reference_dataset.fasta] [-F primer forwad] [-R primer reverse] [-p prefix]
+-r     references fasta file downloaded
+-F     primer forward
+-R     primer reverse
+-p     prefix for primer pair
+-h     print this help
+Example:
+>./DB_NCBI_primers_cut.sh	\
+    -r Prunus_trnL_NCBI.fasta \
+    -F GGGCAATCCTGAGCCAA \
+    -R CCATTGAGTCTCTGCACCTATC \
+    -p Prunus_trnL
+	
+#BOLD
+#DOWNLOAD SEQUENCES
+>./DB_BOLD_download_refs.sh -h
+Usage: ./DB_BOLD_download_refs.sh [-t taxon] [-m marker] [-g geo]
+-t     target taxon, e.g. Arthropoda
+-m     marker, e.g. COI
+-g     geographic location, e.g. Brazil
+-h     print this help
+Example:
+./DB_BOLD_download_refs.sh -t Arthropoda -m COI -g Brazil
+
+#FORMAT REFERENCE SEQUENCES
+#./DB_BOLD_lineage_primers_cut.sh <BOLD_references_downloaded.fasta> <primerF> <primerR>
+>./DB_BOLD_lineage_primers_cut.sh BOLD_Blattodea_COI_Brazil.tsv GCHCCHGAYATRGCHTTYCC TCDGGRTGNCCRAARAAYCA
+
+##################################################################################
+#MERGE ILLUMINA PAIRED-END READS
+##################################################################################
+./1_merge_pear.sh -h
+./1_merge_pear.sh \
+    -f trnL_S1_L001_R1_001_sub.fastq \
+    -r trnL_S1_L001_R2_001_sub.fastq \
+    -o trnL_example \
+    -p 0.001 \
+    -s 20 \
+    -t 4
+./count_fastq_sequences.sh demulti_linked_samples/*.fq > demulti_count_trnL.txt
+
+##################################################################################
+#DEMULTIPLEXING
+##################################################################################
+#PREPARE THE PAIRS OF TAGS FOR DEMULTIPLEXING (POSSIBLE ORIENTATIONS)
+#>>>For Illumina merged reads type 'linked' (BEST OPTION ILLUMINA PAIRED-END)
+#>>>For Illumina combinatorial type 'combinatorial'
+#>>>For Illumina exact paired dual index type 'unique'
+#>>>For Ion torrent dual index not anchored type 'ion'
+#>>>For Ion dual index 3' anchored type 'ion3'
+#>>>For Ion dual index 5' anchored type 'ion5'
+#>>>For Ion dual index both anchored 'ionboth' (BEST OPTION FOR iON DUAL INDEXED)
+
+#perl 2a_preparing_tags_LCPI.pl <tags/mapping file> <mode>
+perl 2a_preparing_tags_LCPI.pl trnL_sub_tags.txt linked
+
+#RUN THE DEMULTIPLEXING
+#THE LAST ARGUMENT IS THE ERROR RATE.
+#THE ERROR RATE IS CALCULATED LIKE THIS:
+#FOR ALLOWING 3 ERRORS IN A 12bp TAG, IS 3/12=0.25
+#FOR ALLOWING ONLY 1 ERROR IN 12bp TAG, IS 1/12=0.08
+#CUTADAPT DEFAULT ERROR RATE IS 0.2
+
+#./2b_demulti_dual_index_linked.sh <merged.fastq> <error rate>
+./2b_demulti_dual_index_linked.sh trnL.assembled.fastq 0.2
+#./2b_demulti_dual_index_ionboth.sh ITS_Ion_dataset.fastq 0.25
+
+##################################################################################
+#READ CLEANING
+##################################################################################
+>./3_tag_primer_clipping_clean_derep_pbs.sh -h
+>./3_tag_primer_clipping_clean_derep_slurm.sh -h
+get your primer's reverse complement in this website:
+http://arep.med.harvard.edu/labgc/adnan/projects/Utilities/revcomp.html
+
+Usage: ./3_tag_primer_clipping_clean_derep_pbs.sh [-b tags file] [-F 5' primer 'Forward'] [-R 3' primer 'Reverse'] [-f revcom 5' primer] [-r revcom 3' primer] [-e 0.1] [-p prefix] [-l amplicon min length] [-d path to demultiplexed samples]
+-b     barcodes/tags mapping file (used in demultiplexing step)
+-F     5' primer (forward direction, like in your primers design file)
+-R     3' primer (forward direction)
+-f     5' primer reverse complement
+-r     3' primer reverse complement
+-e     maximum error rate (the same used for demultiplexing)
+Error rate: allowed errors/adapter or primer length. 2 errors in a 12 bp tag = 2/12 = 0.17
+4 errors in a 26bp degenerated primer = 4/26 = 0.16, 2 errors in a 20bp primer = 0.1 (Cutadapt default).
+-p     PREFIX to quality file (it MUST be the SAME prefix throughout the ENTIRE PIPELINE)
+-l     minimum length for the final amplicon
+-d     path to demultiplexed samples directory. Use pwd.
+-h     print this help
+./count_fastq_sequences.sh dereplicated/*.fasta > derep_count_trnL.txt
+
+##################################################################################
+#CLUSTERING
+##################################################################################
+#./4_clustering_swarm_with_chim_filter_pbs.sh <prefix> <dereplicated fastas directory> <threads>
+#./4_clustering_swarm_with_chim_filter_slurm.sh <prefix> <dereplicated fastas directory> <threads>
+./4_clustering_swarm_with_chim_filter_pbs.sh trnL /cluster/projects/nn9813k/METAPIPE_latest/dereplicated 8
+
+##################################################################################
+#TAXA ASSIGNMENT
+BLAST alignment against custom or NCBI NT local database.
+##################################################################################
+>./5_BLAST_options.sh -h
+
+Usage: ./5_BLAST_options.sh [-f fasta] [-d database] [-s float] [-c float] [-t treads] [-o output]
+-f     representative OTUs multifasta from clustering step
+-d     database to align against: 'NT' or 'My_refs.uniq.fasta'
+-s     minimum similarity between query and subject, float 0-1
+-c     minimum subject coverage reached by the query alignment, float 0-1
+-t     number of threads:
+           custom database: 2 threads for each 1000 seqs.
+           NCBI NT database: 4 threads for each 1000 seqs.
+-o     output name: 'name'_local_blast.tab
+-h     print this help
+Example:
+>./5_BLAST_options.sh	\
+	-f trnL_cluster_representatives2blast.fas	\
+	-d Streptophyta_trnL_NCBI.uniq.fasta	\
+	-s 0.97	\
+	-c 0.5	\
+	-t 8	\
+	-o trnL_NCBI_target97
+	
+##################################################################################
+#BUILD OTU TABLE
+#it needs Python 2.7!!!
+##################################################################################
+#./6a_build_OTU_table.sh <representatives.fas> <.qual file> <Blast_results_formatted2OTUtable.tab> <path to dereplicated fasta files>
+>./6a_build_OTU_table.sh trnL_cluster_representatives.fas trnL.qual Blast_results_formatted2OTUtable.tab /cluster/projects/nn9813k/METAPIPE_latest/dereplicated
+
+#./6b_filter_OTU_table.sh <OTU_table_complete.tab> <.qual file>
+./6b_filter_OTU_table.sh trnL_OTU_table_complete.tab trnL.qual
