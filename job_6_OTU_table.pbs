@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#PBS -N OTU_table
+#PBS -e OTU_table.err
+#PBS -o OTU_table.log
+#PBS -q cpu
+#PBS -l select=1:mpiprocs=10
+
+#it nees Python 2.7!!!
+#./6a_build_OTU_table.sh <representatives.fas> <.qual file> <Blast_results_formatted2OTUtable.tab> <path to dereplicated fasta files>
+./6a_build_OTU_table.sh trnL_cluster_representatives.fas trnL.qual Blast_results_formatted2OTUtable.tab /cluster/projects/nn9813k/METAPIPE_latest/dereplicated
+#./6b_filter_OTU_table.sh <OTU_table_complete.tab> <.qual file>
+./6b_filter_OTU_table.sh trnL_OTU_table_complete.tab trnL.qual
+rm tmp*
+
+

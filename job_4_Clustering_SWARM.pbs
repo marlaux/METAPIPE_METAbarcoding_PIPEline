@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#PBS -N clustering
+#PBS -e swarm.err
+#PBS -o swarm.log
+#PBS -q cpu
+#PBS -l select=8:mpiprocs=10
+
+
+#./4_clustering_swarm_with_chim_filter_pbs.sh <prefix> <dereplicated fastas directory> <threads>
+./4_clustering_swarm_with_chim_filter_pbs.sh trnL /cluster/projects/nn9813k/METAPIPE_latest/dereplicated 8
+
+

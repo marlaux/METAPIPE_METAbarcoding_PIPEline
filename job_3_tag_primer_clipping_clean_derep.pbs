@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#PBS -N read_cleaning
+#PBS -e read_cleaning.err
+#PBS -o read_cleaning.log
+#PBS -q cpu
+#PBS -l select=8:mpiprocs=10
+
+#get your primers reverse complement in this website:
+#http://arep.med.harvard.edu/labgc/adnan/projects/Utilities/revcomp.html
+
+#for details: ./3_tag_primer_clipping_clean_derep_pbs.sh -h
+./3_tag_primer_clipping_clean_derep_pbs.sh -b trnL_sub_tags.txt -F GGGCAATCCTGAGCCAA -R CCATTGAGTCTCTGCACCTATC -f TTGGCTCAGGATTGCCC -r GATAGGTGCAGAGACTCAATGG -p trnL -l 20 -d /cluster/projects/nn9813k/METAPIPE_latest/demulti_linked_samples
+
+

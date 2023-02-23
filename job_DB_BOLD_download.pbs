@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#PBS -N BOLD_download
+#PBS -e BOLD_download.err
+#PBS -o BOLD_download.log
+#PBS -q cpu
+#PBS -l select=1:mpiprocs=10
+
+
+#for details: ./DB_BOLD_download_refs.sh -h
+./DB_BOLD_download_refs.sh -t Arthropoda -m COI -g Brazil
+
+
+exit 0
+

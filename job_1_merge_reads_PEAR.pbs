@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#PBS -N merge_Pear
+#PBS -e merge_Pear.err
+#PBS -o merge_Pear.log
+#PBS -q cpu
+#PBS -l select=8:mpiprocs=10
+
+
+#for details: ./1_merge_pear.sh -h
+./1_merge_pear.sh -f trnL_S1_L001_R1_001_sub.fastq -r trnL_S1_L001_R2_001_sub.fastq -o trnL -p 0.001 -s 20 -t 8
+
+exit 0

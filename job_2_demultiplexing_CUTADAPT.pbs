@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#PBS -N demultiplex
+#PBS -e demultiplex.err
+#PBS -o demultiplex.log
+#PBS -q cpu
+#PBS -l select=1:mpiprocs=10
+
+#PREPARE THE PAIRS OF TAGS FOR DEMULTIPLEXING (POSSIBLE ORIENTATIONS)
+#>>>For Illumina merged reads type 'linked' (BEST OPTION ILLUMINA PAIRED-END)
+#>>>For Illumina combinatorial type 'combinatorial'
+#>>>For Illumina exact paired dual index type 'unique'
+#>>>For Ion torrent dual index not anchored type 'ion'
+#>>>For Ion dual index 3' anchored type 'ion3'
+#>>>For Ion dual index 5' anchored type 'ion5'
+#>>>For Ion dual index both anchored 'ionboth' (BEST OPTION FOR iON DUAL INDEXED)
+
+#perl 2a_preparing_tags_LCPI.pl <tags/mapping file> <mode>
+perl 2a_preparing_tags_LCPI.pl trnL_sub_tags.txt linked
+
+#RUN THE DEMULTIPLEXING
+#THE LAST ARGUMENT IS THE ERROR RATE.
+#THE ERROR RATE IS CALCULATED LIKE THIS:
+#FOR ALLOWING 3 ERRORS IN A 12bp TAG, IS 3/12=0.25
+#FOR ALLOWING ONLY 1 ERROR IN 12bp TAG, IS 1/12=0.08
+#CUTADAPT DEFAULT ERROR RATE IS 0.2
+
+#./2b_demulti_dual_index_linked.sh <merged.fastq> <error rate>
+./2b_demulti_dual_index_linked.sh trnL.assembled.fastq 0.2
+#./2b_demulti_dual_index_ionboth.sh ITS_Ion_dataset.fastq 0.25
+
+
+

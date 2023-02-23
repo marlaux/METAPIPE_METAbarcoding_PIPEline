@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#PBS -N Blast
+#PBS -e Blast.err
+#PBS -o Blast.log
+#PBS -q cpu
+#PBS -l select=8:mpiprocs=10
+
+
+#for details: ./5_BLAST_options.sh -h
+./5_BLAST_options.sh -f trnL_cluster_representatives2blast.fas -d Streptophyta_trnL_NCBI.uniq.fasta -s 0.97 -c 0.5 -t 8 -o trnL_NCBI_target97
+#EXAMPLE NT
+#./5_BLAST_options.sh -f my_dataset_cluster_representatives_clean.fas -d NT -s 0.90 -c 0.6 -t 8 -o my_dataset_NT
+
+
+exit 0
+

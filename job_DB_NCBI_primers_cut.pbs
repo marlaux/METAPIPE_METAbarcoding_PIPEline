@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#PBS -N NCBI_primers_cut
+#PBS -e NCBI_primers_cut.err
+#PBS -o NCBI_primers_cut.log
+#PBS -q cpu
+#PBS -l select=8:mpiprocs=10
+
+
+#for details: ./DB_NCBI_primers_cut.sh -h
+./DB_NCBI_primers_cut.sh -r reference_dataset.fasta -F primer forwad -R primer reverse -p prefix
+
+exit 0
+
