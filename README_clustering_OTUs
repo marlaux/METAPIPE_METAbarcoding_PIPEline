@@ -1,0 +1,21 @@
+The 4_clustering_swarm_with_chim_filter_pbs.sh/4_clustering_swarm_with_chim_filter_slurm.sh scripts run as a pbs and slurm job, respectively.
+The script does not have arguments (options), it is positional:
+
+./4_clustering_swarm_with_chim_filter_pbs.sh <prefix> <dereplicated fastas directory> <threads>
+./4_clustering_swarm_with_chim_filter_slurm.sh <prefix> <dereplicated fastas directory> <threads>
+
+The first part does the global dereplication from the dereplicated by samples step. 
+The second part is the clustering itself, please take a look in SWARM arguments and documentation: https://github.com/torognes/swarm. 
+The third part is the sorting by size.
+The forth part is the chimera search.
+The last part edits the abundance annotation from ';size=X;' to '_X'
+
+Several outputs are generated:
+global_dereplication.sh >> prefix_global_derep.fas
+clustering_swarm >>  prefix_cluster.struct
+			               prefix_cluster.stats
+		                 prefix_cluster_representatives.fas
+			               prefix_cluster.swarms
+chimera_checking >> prefix_cluster_representatives.uchime
+
+all those outputs will be necessary to build the OTU table.
