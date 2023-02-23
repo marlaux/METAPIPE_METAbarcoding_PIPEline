@@ -1,0 +1,12 @@
+The script 3_tag_primer_clipping_clean_derep_pbs.sh is based on the pipeline available in the following address:
+https://github.com/frederic-mahe/swarm/wiki/Fred's-metabarcoding-pipeline
+The script does the whole step at once:
+
+1. Remove tags and primers from demultiplexed sample files
+2. Processes a series of format and cleaning steps
+3. Convert the clean and trimmed fastq to fasta, adding error rate and size to the header
+4. Run the dereplicaion by sample files
+5. creates the quality file with the amplicon id, error rate and abundance, necessary for clustering.
+
+Attention! The cutadapt default behaviour is to trim out the adapters after demultiplexing, but I left the action=lowercase argument in order to allow the adapters/tags/primers 
+visual inspection.
